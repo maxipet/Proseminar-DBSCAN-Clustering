@@ -196,13 +196,14 @@ In Abbildung \ref{fig:2}a) sind die Punkte A und B \textit{dichte-verbunden}, da
 % Dichte-Verbundenheit
 
 \textbf{Dichte-Verbundenheit}\\
-
+Mit der \textit{Dichte-Erreichbarkeit} lässt sich die letzte wichtige Relation, nämlich die \textit{Dichte-Verbundenheit}, für DBSCAN definieren. Zwei Punkte in der Datenmenge sind \textit{dichte-verbunden}, falls es einen Kernpunkt gibt, von welchem beide \texit{dichte-erreichbar} sind. Daraus ergibt sich folgende Definition:\\
 Ein Punkt $ p \in D $ ist \textit{dichte-verbunden} zu $p$, falls
 \begin{itemize}
     \item $\exists\enspace w \in D$ sodass...
         \SubItem{ $p$ ist \textit{dichte-erreichbar} von $o$}
         \SubItem{ $q$ ist \textit{dichte-erreichbar} von $o$}
 \end{itemize}
+In Abbildung \ref{fig:2}b) sind die Punkte A und B \textit{dichte-verbunden}, denn sie sind beide von Punkt K aus \textit{dichte-erreichbar}.
 
 % Abbildung 2
 
@@ -216,26 +217,37 @@ Ein Punkt $ p \in D $ ist \textit{dichte-verbunden} zu $p$, falls
 \end{figure}
 
 % Cluster
-    
+
 \textbf{Cluster}\\
-Ein Cluster $ C \subseteq D $ ist definiert, sodass
+Die wohl wichtigste Definition für DBSCAN ist, dass eines \textit{Clusters}. Ein \textit{Cluster} besteht aus allen Punkten, welche von einem beliebigen \textit{Kernpunkt} des \textit{Clusters} aus \textit{dichte-erreichbar} sind.\\
+Ein Cluster $ C \subseteq D $ ist also definiert, sodass
 \begin{itemize}
     \item $\forall\enspace p,q \in D$ gilt, falls
         \SubItem{$p \in C$}
         \SubItem{$q$ ist \textit{dichte-erreichbar} von $p$}
-        
     $\Rightarrow q \in C$
-    
     \item $\forall\enspace p,q \in C$ gilt $p$ ist \textit{dichte-erreichbar} von $q$
 \end{itemize}
+In Abbildung \ref{fig:3} sind 3 \textit{Cluster} zu erkennen, wobei kein Punkt eines bestimmten \textit{Clusters} zu einem Punkt eines anderen \textit{Clusters} \textit{dichte-erreichbar} ist.\\
 
 % Noise
     
 \textbf{Noise}\\
+Eine weitere Eigenschaft des DBSCAN Clusterings ist, dass er auch \textit{Noise} erkennen kann und somit die \textit{Cluster} nicht mit Punkten verunreinigt werden, welche weit außerhalb und erkennbar nicht zum \textit{Cluster} gehören. Der \textit{Noise} wird in DBSCAN als die Punkte erkannt, welche zu keinem Cluster gehören.\\
 Der Noise der Datenmenge $D$ mit den Clustern $C_1,\dots,C_k$ ist definiert als
 \begin{itemize}
     \item $ \{ p \in D \enspace | \enspace p \notin C_1,\dots,C_k \} $
 \end{itemize}
+In Abbildung \ref{fig:3} sind neben den 3 \textit{Clustern} noch 4 weiter Punkte zu sehen. Diese werden mit den oben festgelegten Paramtern den \textit{Noise} der Datenmenge bilden, da sie selbst kein eigenes \textit{Cluster} bilden, da keiner der 4 Punkte selbst \textit{Kernpunkt} ist (es gibt ja nur 4 Punkte innerhalb der Umgebung jedes Punktes und es werden 5 benötigt) und sie sind zu weit von den anderen \textit{Clustern} entfernt um von einem Punkt dieser \textit{dichte-erreichbar} zu sein.
+
+% Abbildung 3
+
+\begin{figure}[hb]
+    \centering
+    \includesvg[width=0.75\textwidth]{figures/figure5.svg}
+    \caption{Cluster und Noise}
+    \label{fig:3}
+\end{figure}
 
 %
 % Implementierung
@@ -243,8 +255,7 @@ Der Noise der Datenmenge $D$ mit den Clustern $C_1,\dots,C_k$ ist definiert als
 
 \subsection{Implementierung}
 \label{sec:impl}
-
-\newpage
+DBSCAN kann man grundlegend in 2 Segmente zerlegen. Im ersten Segment wird die Datenmenge auf \textit{Kernpunkte} durchsucht und sobald ein \textit{Kernpunkt} entdeckt wird, generiert das zweite Segment, dass zum \textit{Kernpunkt} zugehörige \textit{Cluster}.
 
 \begin{lstlisting}[caption={DBSCAN},label={lst:dbscan}]
 void DBSCAN(data, eps, minPts) {

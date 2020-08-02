@@ -10,6 +10,7 @@
 \usepackage{adjustbox}
 \usepackage{subfig}
 \usepackage{amssymb}
+\usepackage{url}
 \usepackage{amsmath}
 \usepackage{listings}
 \usepackage{hyperref}
@@ -53,7 +54,7 @@
 %
 
 \begin{abstract}
-Im Bereich Data Mining existieren zahlreiche Methoden, um aus gesammelten Daten Muster und somit auch neues Wissen zu extrahieren. Normalerweise liegen diese Muster in Form von Clustern, also Anhäufungen von Datensätzen, vor. Es gibt eine Vielzahl von Clustering Algorithmen, welche genau diese Aufgabe erledigen und somit ohne menschliche Hilfe aus Daten neues Wissen schaffen können. In dieser Arbeit wird der 1996 vorgestellte DBSCAN Algorithmus thematisch noch einmal aufbearbeitet und mit anderen Clustering Verfahren verglichen. Es wird außerdem bewertet ob DBSCAN die enormen Herausforderungen, welche in Folge von Big Data entstehen, bewältigen kann.
+Im Bereich Data Mining existieren zahlreiche Methoden, um aus gesammelten Daten Muster und somit auch neues Wissen zu extrahieren. Normalerweise liegen diese Muster in Form von Clustern, also Anhäufungen von Datensätzen, vor. Es gibt eine Vielzahl von Clustering Algorithmen, welche genau diese Aufgabe erledigen und somit ohne menschliche Hilfe aus Daten neues Wissen schaffen können. In dieser Arbeit wird der 1996 vorgestellte DBSCAN Algorithmus thematisch noch einmal aufgearbeitet und mit anderen Clustering Verfahren verglichen. Es wird außerdem bewertet ob DBSCAN die enormen Herausforderungen, welche durch große Datensätze entstehen, bewältigen kann.
 \end{abstract}
 
 %
@@ -61,9 +62,8 @@ Im Bereich Data Mining existieren zahlreiche Methoden, um aus gesammelten Daten 
 %
 
 \section{Einführung}
-Die Cluster Analyse gehört zu den Knowledge-Discovery Methoden und versteht sich als Teildisziplin des Data Minings. Sie hat zahlreiche Anwendungen in Wissenschaft und Wirtschaft, weshalb zuverlässige Algorithmen benötigt werden, sodass diese Aufgaben automatisiert erledigt werden können. Ein Anwendungsbeispiel wäre die Analyse des Kaufverhaltens von Kunden auf einer Website, um mögliche Zielgruppen und ihre Interessen einfacher zu gruppieren. Es lässt sich leicht vorstellen, dass die Datenmenge in solchen Anwendungen sehr groß werden kann. Deshalb ist die Effizienz dieser Algorithmen nicht zu vernachlässigen.\\
-In diesem Proseminar wird der DBSCAN Algorithmus aufbearbeitet. Hierfür werden zuerst in \hyperref[sec:grund]{Abschnitt 2} die Grundlagen für DBSCAN vorgestellt, welche benötigt werden, um den Algorithmus, welcher in \hyperref[sec:kern]{Abschnitt 4} vorgestellt wird, zu verstehen.
-In \hyperref[sec:perf]{Abschnitt 5} soll dann DBSCAN mit den Clusteringverfahren SLINK, $k$-Means und OPTICS verglichen werden. Hierbei wird besonders auf die Anforderungen geachtet, welche durch Big Data entstehen. Anschließend wird in \hyperref[sec:fazit]{Abschnitt 6} beurteilt, ob die Verwendung von DBSCAN noch zeitgemäß ist und welche Alternativen zur Verfügung stehen.
+Die Clusteranalyse gehört zu den Knowledge-Discovery Methoden und versteht sich als Teildisziplin des Data Minings \cite{BIGDATA}. Sie hat zahlreiche Anwendungen in Wissenschaft und Wirtschaft, weshalb zuverlässige Algorithmen benötigt werden, sodass diese Aufgaben automatisiert erledigt werden können. Ein Anwendungsbeispiel wäre die Analyse des Kaufverhaltens von Kunden auf einer Website, um mögliche Zielgruppen und ihre Interessen einfacher zu gruppieren. Die Datenmenge könnte hier beispielsweise aus dem Alter der Kunden und der Kategorie des gekauften Artikels bestehen. Möchte man nun Zusammenhänge zwischen diesen beiden Attributen untersuchen, könnte man Cluster in der Datenmenge bestimmen, welche dann die Zusammenhänge repräsentieren. Es lässt sich leicht vorstellen, dass die Datenmenge in solchen Anwendungen sehr groß werden kann, weshalb die Suche nach Clustern von Computern automatisiert werden muss, wobei die Effizienz der verwendeten Algorithmen sehr relevant ist.\\
+In diesem Proseminar wird der DBSCAN \cite{DBSCAN} Algorithmus aufgearbeitet, welcher von Kriegel et al. 1996 vorgestellt wurde und einer der am häufigsten benutzten Algorithmen für die Clusteranalyse ist. Er verwendete als erster das Konzept des Dichte basierten Clusterings. Zuerst werden in \hyperref[sec:grund]{Abschnitt \ref{sec:grund}} die Grundlagen für DBSCAN vorgestellt, welche benötigt werden, um den Algorithmus, welcher in \hyperref[sec:dbscan]{Abschnitt \ref{sec:dbscan}} vorgestellt wird, zu verstehen. In \hyperref[sec:related]{Abschnitt \ref{sec:related}} werden hauptsächlich drei alternative Clusteringverfahren kurz vorgestellt, nämlich SLINK \cite{HIER}, $k$-Means \cite{TOP10} und OPTICS \cite{OPTICS}, welche in \hyperref[sec:perf]{Abschnitt \ref{sec:perf}} mit DBSCAN verglichen werden. Hierbei wird besonders auf die Anforderungen geachtet, welche durch große Datenmengen (Big Data) \cite{BIGDATA} entstehen. Anschließend wird in \hyperref[sec:fazit]{Abschnitt \ref{sec:fazit}} beurteilt, ob die Verwendung von DBSCAN noch zeitgemäß ist und welche Alternativen zur Verfügung stehen.
 
 %
 % Grundlagen
@@ -71,7 +71,7 @@ In \hyperref[sec:perf]{Abschnitt 5} soll dann DBSCAN mit den Clusteringverfahren
 
 \section{Grundlagen}
 \label{sec:grund}
-Im folgenden Abschnitt werden wichtige mathematische Grundlagen für das DBSCAN Verfahren erläutert und auf die Datenstruktur R*-Tree eingegangen, welche eine effiziente Implementierung von DBSCAN ermöglicht.
+Im folgenden Abschnitt werden wichtige mathematische Grundlagen für das DBSCAN Verfahren erläutert und auf die Datenstruktur R*-Tree \cite{R*} eingegangen, welche eine effiziente Implementierung von DBSCAN ermöglicht.
 
 % Daten
 
@@ -83,18 +83,17 @@ Unsere Datenmenge $D \subseteq \mathbb{R}^n$ ist dann die Menge, welche alle Dat
 
 \subsection{Abstand}
 \label{sec:abstand}
-Der Ansatz von DBSCAN zur Erkennung von Clustern setzt die Berechnung von Abständen zwischen Datenpunkten voraus, da diese die Grundlage der im nächsten Abschnitt definierten Umgebungen sind. Es gibt eine Vielzahl von verschiedenen Metriken, welche verwendet werden können um den Abstand zu definieren. Im weiteren Verlauf dieser Arbeit wird jedoch nur der Euklidische Abstand betrachtet, da dieser dem intuitiven Abstand in z.B. einer 2-Dimensionalen Ebene entspricht und deshalb gut für Demonstrationen bzw. Abbildungen geeignet ist. Der Abstand zwischen 2 Punkten $p,q \in D$ ist definiert als
+Der Ansatz von DBSCAN zur Erkennung von Clustern setzt die Berechnung von Abständen zwischen Datenpunkten voraus, da diese die Grundlage der im nächsten Abschnitt definierten Umgebungen sind. Es gibt eine Vielzahl von verschiedenen Metriken, welche verwendet werden können um den Abstand zu definieren. Im weiteren Verlauf dieser Arbeit wird jedoch nur der Euklidische Abstand betrachtet, da dieser dem intuitiven Abstand in z.B. einer 2-Dimensionalen Ebene entspricht und deshalb gut für Demonstrationen bzw. Abbildungen geeignet ist. Der Abstand zwischen 2 Punkten $p,q \in D$ ist definiert \cite{METRIC} als
 \begin{align}
     d(p,q) = \sqrt{\sum_{i=1}^{n}{(p_i+q_i)^2}} = \sqrt{(p_1+q_1)^2 + \dots + (p_n+q_n)^2} \notag
 \end{align}
-Bei der eigentlichen Implementation von DBSCAN kann jedoch eine beliebige Metrik gewählt werden, welche jeweils andere Ergebnisse erzielen kann.
-Die Wahl der richtigen Metrik soll hier aber nicht weiter diskutiert werden.
+Bei der eigentlichen Implementation von DBSCAN kann jedoch eine beliebige Metrik gewählt werden, welche jeweils andere Ergebnisse erzielen kann. Zum Beispiel kann die Manhattan-Distanz \cite{MANHATTAN} als Metrik gewählt werden, welche zu sehr eckigen Umgebungen führt. Die Wahl der richtigen Metrik hängt natürlich von der jeweiligen Anwendung ab, sodass bevor man sich entscheidet, ein gewisses Maß an Nachforschung betrieben werden muss. Da man nicht pauschal sagen kann, welche die beste Metrik für jeweilige Datenmenge ist, soll dieser Aspekt hier nicht weiter diskutiert werden.
 
 % Umgebung
 
 \subsection{Umgebung}
 Eine Umgebung um einen Punkt ist die natürliche Erweiterung der zuletzt definierten Abstandsfunktion. Hiermit ist die Menge aller Punkte gemeint, welche innerhalb eines gegebenen Abstands zu einem bestimmten Punkt liegen.
-Definiert wird die Umgebung von Punkt $p \in D$ bezüglich des max. Abstands $\epsilon \in \mathbb{R}_{>0}$ als
+Definiert wird die Umgebung \cite{BALL} von Punkt $p \in D$ bezüglich des Abstands $\epsilon \in \mathbb{R}_{>0}$ als
 \begin{align}
     U_{\epsilon}(p) = \{ q \in D \enspace | \enspace d(p,q) < r \} \notag
 \end{align}
@@ -107,47 +106,24 @@ Die grundlegende Methode von DBSCAN zur Bestimmung von Clustern beruht auf der B
 Um das Ermitteln der Umgebung eines Punktes effizient zu gestalten, wird auf die Datenstruktur R*-Tree \cite{R*} zurückgegriffen. Diese ermöglicht es die Umgebung eines Punktes in $O(n^{1/3})$ \cite{REV} zu finden, wobei hier $n$ die Anzahl der Datenpunkte (also $n = |D|$) ist. Würde man beispielsweise eine Liste verwenden um die Datenmenge zu speichern, bräuchte man $O(n)$ um die Umgebung zu bestimmen. Deshalb ist die Verwendung von R*-Trees unerlässlich um eine effiziente Implementierung des Algorithmus zu gewährleisten.
 
 %
-% Verwandte Arbeiten
-%
-
-\section{Verwandte Arbeiten}
-Nachdem nun die Grundlagen für den Algorithmus erklärt wurden, richtet sich der nächste Abschnitt an wichtige Veröffentlichungen für diese Arbeit. Es werden unter anderem 3 weitere Clustering Algorithmen vorgestellt, mit welchen DBSCAN in \hyperref[sec:perf]{Abschnitt \ref{sec:perf}} verglichen wird. Zu Beginn sollte jedoch auf die Veröffentlichung von DBSCAN selbst eingangen werden.
-
-% Original Paper
-
-\subsection{Original Paper}
-Der DBSCAN Algorithmus wurde von Kriegel et al. 1996 vorgestellt \cite{DBSCAN} und ist einer der am häufigsten benutzten Algorithmen für die Clusteranalyse. Er verwendete als erster das Konzept des Dichte basierten Clusterings. Das Paper gehört außerdem zu den am meisten zitierten Publikationen im Bereich Data Mining und gewann im Jahr 2014 den \glqq SIGKDD Test of Time award\grqq{} \footnote{\href{https://www.kdd.org/News/view/2014-sigkdd-test-of-time-award}{https://www.kdd.org/News/view/2014-sigkdd-test-of-time-award}}.
-
-% OPTICS
-
-\subsection{OPTICS}
-OPTICS wurde 1999 als eine Weiterentwicklung von DBSCAN veröffentlicht \cite{OPTICS}. Das Verfahren verwendet das Selbe, auf der Dichte von Datenpunkten beruhende Konzept, zur Identifikation von Clustern. Jedoch ist OPTICS so gestaltet, dass es Cluster verschiedener Dichten erkennen kann und so unter anderem im Vergleich zu DBSCAN keinen $\epsilon$ Parameter benötigt. Somit muss bei der Verwendung von OPTICS ein Wert weniger angepasst werden, wodurch die Benutzung einfacher wird. OPTICS greift genau wie DBSCAN auf die R*-Tree Datenstruktur zurück, mit welcher Laufzeiten von $O(n\log n)$ bezüglich der Datenmenge erreicht werden.
-
-% K-Means
-
-\subsection{K-Means}
-Es soll nun auf einen Vertreter der Methode des \textit{partitionierenden} Clusterings näher eingegangen werden. $k$-Means \cite{TOP10} ist ein sehr einfacher, aber effektiver Algorithmus zur Aufteilung bzw. Partitionierung der Datenmenge. Das Ziel ist es jedes Cluster in einem eigenen Teil dieser Partitionierung zu haben. $k$-Means passt hierfür iterativ $k$ verschiedene Punkte so an, dass eine bestimmte Zielfunktion minimiert wird, welche so definiert ist, dass wenn man ein lokales Minimum erreicht, die Partitionierung eine gute Approximation für die Cluster ergeben soll. Hierbei ergibt sich jedoch das Problem, dass man immer nur $k$ verschiedene Cluster bestimmen kann, weshalb dieser Parameter an die Datenmenge angepasst werden muss.
-
-% SLINK
-
-\subsection{SLINK}
-Als ein Algorithmus, welcher auf dem Prinzip des hierarchischen Clusterings beruht, wird an dieser Stelle Single-Linkage-Clustering  (SLINK) \cite{HIER} vorgestellt. SLINK versucht in mehreren Schritten aus der Menge aller Punkte einen Baum zu erstellen, bei welchem dann die einzelnen Cluster zusammenhängen. Der Algorithmus kombiniert hierfür immer die beiden \textit{nächstgelegenen} Punkte, welche noch nicht kombiniert wurden. Hierbei bedeutet \textit{nächstgelegen}, dass immer die beiden Punkte gewählt werden, welche minimalen Abstand voneinander haben. Die Punkte werden also anhand ihres Abstands zueinander hierarchisch geordnet. Da der Algorithmus aus den einzelnen Punkten die Menge der Cluster aufbaut, gehört er zur Gruppe der agglomerativen Verfahren des hierarchischen Clusterings, was bedeutet, dass die Hierarchie \glqq Bottom-up\grqq{} aufgebaut wird.
-
-%
 % DBSCAN
 %
 
 \section{DBSCAN}
+\label{sec:dbscan}
 In diesem Abschnitt soll der DBSCAN Algorithmus vorgestellt werden.
-Hierfür werden zuerst die Kernkonzepte in \hyperref[sec:kern]{Abschnitt 4.1} erklärt, welche die Grundlage für das Verfahren bilden. Im darauf folgenden \hyperref[sec:impl]{Abschnitt 4.2} wird dann die Implementation von DBSCAN beschrieben und auf weitere Ideen zur Verwendung des Verfahrens eingegangen.
+Hierfür werden zuerst die Kernkonzepte in \hyperref[sec:kern]{Abschnitt \ref{sec:kern}} erklärt, welche die Grundlage für das Verfahren bilden. Im darauf folgenden \hyperref[sec:impl]{Abschnitt \ref{sec:impl}} wird dann die Implementation von DBSCAN beschrieben und auf weitere Ideen zur Verwendung des Verfahrens eingegangen.
 
 %
 % Kernkonzepte
 %
 
+\begin{minipage}{\textwidth}
+
 \subsection{Kernkonzepte}
 \label{sec:kern}
-DBSCAN benötigt 2 Parameter zur Bestimmung von Clustern, nämlich $\lstinline{eps} \in \mathbb{R}$ und $\lstinline{minPoints} \in \mathbb{N}$. Hierbei legt \lstinline{eps} die Größe der Umgebungen um die Punkte in der Datenmenge fest und \lstinline{minPoints} wird benötigt zur Definition eines Kernpunktes.\\
+DBSCAN benötigt 2 Parameter zur Bestimmung von Clustern, nämlich $\lstinline{eps} \in \mathbb{R}$ und $\lstinline{minPoints} \in \mathbb{N}$. Die beiden Paramter sind hierbei fest gewählt und verändern sich während der Ausführung des Algorithmus, bzw. innerhalb der Datenmenge nicht. Hierbei legt \lstinline{eps} die Größe der Umgebungen um die Punkte in der Datenmenge fest und \lstinline{minPoints} wird für die Festlegung eines Kernpunktes benötigt.\\
+Die folgenden Definitionen sind aus der Veröffentlichung von DBSCAN \cite{DBSCAN} entnommen.\\
 
 % Kernpunkt
 
@@ -162,7 +138,7 @@ Sei $\lstinline{eps} = 1$ und $\lstinline{minPoints} = 5$, dann ist Punkt A in A
 % Direkte Dichte-Erreichbarkeit
 
 \textbf{Direkte Dichte-Erreichbarkeit}\\
-Das nächste wichtige Konzept, ist das der \textit{direkten Dichte-Erreichbarkeit}. Diese nicht symmetrische Relation setzt immer einen Kernpunkt in Relation zu allen anderen Punkten in seiner Umgebung. Das bedeutet, dass alle Punkte innerhalb der Umgebung eines \textit{Kernpunktes} \textit{direkt dichte-erreichbar} von diesem sind. Somit ergibt sich folgende Definition:\\
+Das nächste wichtige Konzept ist das der \textit{direkten Dichte-Erreichbarkeit}. Diese nicht symmetrische Relation setzt immer einen Kernpunkt in Relation zu allen anderen Punkten in seiner Umgebung. Das bedeutet, dass alle Punkte innerhalb der Umgebung eines \textit{Kernpunktes} \textit{direkt dichte-erreichbar} von diesem sind. Somit ergibt sich folgende Definition:\\
 Ein Punkt $ p \in D $ ist \textit{direkt dichte-erreichbar} von k, falls
 \begin{itemize}
     \item $k$ ist \textit{Kernpunkt}
@@ -174,14 +150,18 @@ In Abbildung \ref{fig:1}b) wäre (mit den gleichen Parametern \lstinline{eps} un
 
 \begin{figure}[H]
     \centering
-    \subfloat[]{{\includesvg[width=0.36\textwidth]{figures/figure1.svg}}}%
+    \subfloat[]{{\includesvg[width=0.30\textwidth]{figures/figure1.svg}}}%
     \qquad
-    \subfloat[]{{\includesvg[width=0.36\textwidth]{figures/figure2.svg}}}
-    \caption{Kernpunke und direkt Dichte-Erreichbarkeit}%
+    \subfloat[]{{\includesvg[width=0.30\textwidth]{figures/figure2.svg}}}
+    \caption{Kernpunke und direkt Dichte-Erreichbarkeit in Anlehnung an \cite{SKRIPT}}%
     \label{fig:1}%
 \end{figure}
 
+\end{minipage}
+
 % Dichte-Erreichbarkeit
+
+\begin{minipage}{\textwidth}
 
 \textbf{Dichte-Erreichbarkeit}\\
 Die Erweiterung der \textit{direkten Dichte-Erreichbarkeit} ist die im folgenden definierte \textit{Dichte-Erreichbarkeit}. Dabei sind $p$ und $q$ Punkte in der Datenmenge und es gibt eine Kette von \textit{direkt dichte-erreichbaren} Punkten, welche am Anfang \textit{direkt dichte-erreichbar} zu $p$ ist und $p$ \textit{direkt dichte-erreichbar} zum Ende der Kette ist. Formal definiert wird die \textit{Dichte-Erreichbarkeit} folgendermaßen:\\
@@ -208,16 +188,20 @@ In Abbildung \ref{fig:2}b) sind die Punkte A und B \textit{dichte-verbunden}, de
 
 % Abbildung 2
 
-\begin{figure}[hb]
+\begin{figure}[H]
     \centering
     \subfloat[]{{\includesvg[width=0.47\textwidth]{figures/figure3.svg}}}%
     \qquad
     \subfloat[]{{\includesvg[width=0.47\textwidth]{figures/figure4.svg}}}
-    \caption{Dichte-Erreichbarkeit und Dichte-Verbundenheit}%
+    \caption{Dichte-Erreichbarkeit und Dichte-Verbundenheit in Anlehnung an \cite{SKRIPT}}%
     \label{fig:2}%
 \end{figure}
 
+\end{minipage}
+
 % Cluster
+
+\begin{minipage}{\textwidth}
 
 \textbf{Cluster}\\
 Die wohl wichtigste Definition für DBSCAN ist die des \textit{Clusters}. Ein \textit{Cluster} besteht aus allen Punkten, welche von einem beliebigen \textit{Kernpunkt} des \textit{Clusters} aus \textit{dichte-erreichbar} sind.\\
@@ -225,9 +209,9 @@ Ein Cluster $ C \subseteq D $ ist also definiert, sodass
 \begin{itemize}
     \item $\forall\enspace p,q \in D$ gilt, falls
         \SubItem{$p \in C$}
-        \SubItem{$q$ ist \textit{dichte-erreichbar} von $p$}
-    $\Rightarrow q \in C$
-    \item $\forall\enspace p,q \in C$ gilt $p$ ist \textit{dichte-erreichbar} von $q$
+        \SubItem{$q$ ist \textit{dichte-erreichbar} von $p$}\\
+        $\Rightarrow q \in C$
+    \item $\forall\enspace p,q \in C$ gilt $p$ ist \textit{dichte-verbunden} mit $q$
 \end{itemize}
 In Abbildung \ref{fig:3} sind drei \textit{Cluster} zu erkennen, wobei kein Punkt eines bestimmten \textit{Clusters} zu einem Punkt eines anderen \textit{Clusters} \textit{dichte-erreichbar} ist.\\
 
@@ -243,12 +227,14 @@ In Abbildung \ref{fig:3} sind neben den 3 \textit{Clustern} noch 4 weitere Punkt
 
 % Abbildung 3
 
-\begin{figure}[hb]
+\begin{figure}[H]
     \centering
     \includesvg[width=0.75\textwidth]{figures/figure5.svg}
     \caption{Cluster und Noise}
     \label{fig:3}
 \end{figure}
+
+\end{minipage}
 
 %
 % Implementierung
@@ -257,6 +243,7 @@ In Abbildung \ref{fig:3} sind neben den 3 \textit{Clustern} noch 4 weitere Punkt
 \subsection{Implementierung}
 \label{sec:impl}
 DBSCAN kann man grundlegend in 2 Segmente aufteilen. Das erste Segment durchsucht die Datenmenge nach \textit{Kernpunkten} und sobald sie einen entdeckt, werden im zweiten Segment alle vom gefundenen \textit{Kernpunkt} \textit{dichte-erreichbaren} Punkte zum selben \textit{Cluster} hinzugefügt.\\
+Die folgenden Codeausschnitte sind angelehnt an die Veröffentlichung von DSCBAN \cite{DBSCAN}.
 
 % Erklärung 1
 
@@ -264,7 +251,7 @@ Im Codeausschnitt \ref{lst:dbscan} sieht man nun die erste der beiden Funktionen
 
 % Codeausschnitt 1
 
-\begin{lstlisting}[caption={DBSCAN},label={lst:dbscan}]
+\begin{lstlisting}[caption={DBSCAN Methode in Anlehnung an \cite{DBSCAN}},label={lst:dbscan}]
 void DBSCAN(data, eps, minPts) {
     // Jeder Punkt in data hat clusterID == NONE (kein Cluster)
     clusterID = 1;
@@ -283,13 +270,13 @@ void DBSCAN(data, eps, minPts) {
 
 Die Funktion läuft durch alle Datenpunkte und ruft mit jedem Punkt, welcher noch keinem \textit{Cluster} zugewiesen wurde, die \lstinline{ExpandCluster} Funktion auf, welche überprüft ob, es sich um einen \textit{Kernpunkt} handelt und in diesem Fall das zugehörige \textit{Cluster} bestimmt.\\
 Hierfür ermittelt die Funktion, welche in Codeausschnit \ref{lst:expcluster} zu sehen ist, zuerst die Umgebung des betrachteten Punktes \lstinline{point} und speichert diese in der Variable \lstinline{seeds}.
-Um diese Umgebung effizient zu bestimmen, ist die Datenmenge als ein R*-Tree implementiert, denn so kann die in \hyperref[sec:rtree]{Abschnitt 2.4} erklärte Laufzeit von $\Omega(n^{1/3})$ erreicht werden. Anschließend wird überprüft, ob \lstinline{point} ein \textit{Kernpunkt} ist, also \lstinline{seeds} mindestens \lstinline{minPoints} Punkte beinhaltet. Handelt es sich um keinen \textit{Kernpunkt} wird der Punkt provisorisch als \lstinline{NOISE} markiert, anderenfalls wird aufbauend auf \lstinline{point} das zugehörige \textit{Cluster} gebildet. Es werden hierfür in der while-Schleife alle Punkte bestimmt, welche \textit{dichte-erreichbar} von \lstinline{point} sind.
+Um diese Umgebung effizient zu bestimmen, ist die Datenmenge als ein R*-Tree implementiert, denn so kann die in \hyperref[sec:rtree]{Abschnitt \ref{sec:rtree}} erklärte Laufzeit von $\Omega(n^{1/3})$ erreicht werden. Anschließend wird überprüft, ob \lstinline{point} ein \textit{Kernpunkt} ist, also \lstinline{seeds} mindestens \lstinline{minPoints} Punkte beinhaltet. Handelt es sich um keinen \textit{Kernpunkt} wird der Punkt provisorisch als \lstinline{NOISE} markiert, anderenfalls wird aufbauend auf \lstinline{point} das zugehörige \textit{Cluster} gebildet. Es werden hierfür in der while-Schleife alle Punkte bestimmt, welche \textit{dichte-erreichbar} von \lstinline{point} sind.
 
 % Codeausschnitt 2
 
 \newpage
 
-\begin{lstlisting}[caption={ExpandCluster},label={lst:expcluster}]
+\begin{lstlisting}[caption={ExpandCluster Methode in Anlehnung an \cite{DBSCAN}},label={lst:expcluster}]
 bool ExpandCluster(data, point, clusterID, eps, minPts) {
     seeds = data.reqionQuery(point, eps);
     if seeds.size < minPts {
@@ -323,14 +310,42 @@ bool ExpandCluster(data, point, clusterID, eps, minPts) {
 Somit wird entweder von jedem Punkt versucht ein \textit{Cluster} zu bauen, oder er wird vorher einem anderen \textit{Cluster} zugewiesen, andernfalls wird er als \lstinline{NOISE} markiert. Es wird also für jeden Punkt nur einmal die Umgebung bestimmt. Daraus folgt, dass $n$-mal die Umgebung, mit einer Laufzeit von $\Omega(n^{1/3})$, berechnet wird. Deswegen ist die Laufzeit des Algorithmus (da die anderen Operationen alle konstant in ihrer Laufzeit sind) insgesamt in $\Omega(n^{4/3})$ \cite{REV}. 
 
 %
-% Performance
+% Verwandte Arbeiten
 %
 
 \newpage
 
+\section{Verwandte Arbeiten}
+\label{sec:related}
+Nachdem nun der DBSCAN Algorithmus vorgestellt wurde, richtet sich der nächste Abschnitt an 3 alternative Verfahren zur Clusteranalyse, mit welchen DBSCAN in \hyperref[sec:perf]{Abschnitt \ref{sec:perf}} verglichen wird. Außerdem wird kurz das MapReduce Modell, bzw. seine Anwendung auf den DBSCAN Algorithmus erläutert.
+
+% OPTICS
+
+\subsection{OPTICS}
+OPTICS wurde 1999 als eine Weiterentwicklung von DBSCAN veröffentlicht \cite{OPTICS}. Das Verfahren verwendet das Selbe, auf der Dichte von Datenpunkten beruhende Konzept, zur Identifikation von Clustern. Jedoch ist OPTICS so gestaltet, dass es Cluster verschiedener Dichten erkennen kann und so unter anderem im Vergleich zu DBSCAN keinen $\epsilon$ Parameter benötigt.  Somit muss bei der Verwendung von OPTICS ein Wert weniger angepasst werden, wodurch die Benutzung einfacher wird. OPTICS greift genau wie DBSCAN auf die R*-Tree Datenstruktur zurück, mit welcher deutlich effizientere Laufzeiten erreicht werden.
+
+% K-Means
+
+\subsection{K-Means}
+Es soll nun auf einen Vertreter der Methode des \textit{partitionierenden} Clusterings näher eingegangen werden. $k$-Means \cite{TOP10} ist ein sehr einfacher, aber effektiver Algorithmus zur Aufteilung bzw. Partitionierung der Datenmenge. Das Ziel ist es jedes Cluster in einem eigenen Teil dieser Partitionierung zu haben. $k$-Means passt hierfür iterativ $k$ verschiedene Punkte so an, dass eine bestimmte Zielfunktion minimiert wird, welche so definiert ist, dass wenn man ein lokales Minimum erreicht, die Partitionierung eine gute Approximation für die Cluster ergeben soll. Hierbei ergibt sich jedoch das Problem, dass man immer nur $k$ verschiedene Cluster bestimmen kann, weshalb dieser Parameter an die Datenmenge angepasst werden muss. $k$-Means hat insgesamt eine Laufzeit von $O(n^2)$ und ist somit ineffizienter als DBSCAN, jedoch kann der Algorithmus sehr leicht und verständlich implementiert werden.
+
+% SLINK
+
+\subsection{SLINK}
+Als ein Algorithmus, welcher auf dem Prinzip des hierarchischen Clusterings beruht, wird an dieser Stelle Single-Linkage-Clustering (SLINK) \cite{HIER} vorgestellt, welcher eine Laufzeit von $O(n^2)$ hat und somit langsamer als der DBSCAN Algorithmus ist. SLINK versucht in mehreren Schritten aus der Menge aller Punkte einen Baum zu erstellen, bei welchem dann die einzelnen Cluster zusammenhängen. Der Algorithmus kombiniert hierfür immer die beiden \textit{nächstgelegenen} Punkte, welche noch nicht kombiniert wurden. Hierbei bedeutet \textit{nächstgelegen}, dass immer die beiden Punkte gewählt werden, welche minimalen Abstand voneinander haben. Die Punkte werden also anhand ihres Abstands zueinander hierarchisch geordnet. Da der Algorithmus aus den einzelnen Punkten die Menge der Cluster aufbaut, gehört er zur Gruppe der agglomerativen Verfahren des hierarchischen Clusterings, was bedeutet, dass die Hierarchie \glqq Bottom-up\grqq{} aufgebaut wird.
+
+% MR-DBSCAN
+
+\subsection{MR-DBSCAN}
+Der 2011 vorgestellte MR-DBSCAN \cite{PARALLEL} Algorithmus, ist eine Erweiterung von DBSCAN, welche auf dem MapReduce \cite{MAPREDUCE} Programmiermodell von Google basiert und so den ursprünglichen Algorithmus parallelisiert, also eine simultane Ausführung auf mehreren Computern ermöglicht. Dies führt zu einer massiven Performanceverbesserung, gerade wenn große Datenmengen betrachtet werden, obwohl die gleichen Dichte basierten Konzepte zum Einsatz kommen um die Cluster zu bestimmen, wie bei DBSCAN. 
+
+%
+% Performance
+%
+
 \section{Performance Evaluation}
 \label{sec:perf}
-In diesem Abschnitt soll es um die Leistungsfähigkeit von DBSCAN im Vergleich mit den anderen, in \hyperref[sec:abstand]{Abschnitt 3.2} vorgestellten, Clustering Algorithmen gehen. Dabei werden die Kriterien Laufzeit, Speicherplatz, die Einfachheit der Implementierung und die resultierenden Cluster betrachtet.
+In diesem Abschnitt soll es um die Leistungsfähigkeit von DBSCAN im Vergleich mit den anderen, in \hyperref[sec:related]{Abschnitt \ref{sec:related}} vorgestellten, Clustering Algorithmen gehen. Dabei werden die Kriterien Laufzeit, Speicherplatz, die Einfachheit der Implementierung und die resultierenden Cluster betrachtet.
 
 % Laufzeit & Speicherplatz
 
@@ -338,10 +353,10 @@ In diesem Abschnitt soll es um die Leistungsfähigkeit von DBSCAN im Vergleich m
 
 In Abbildung \ref{fig:4} sind die Laufzeit- und Speicherplatzkomplexität der vier Algorithmen aufgeführt. Betrachten wir zuerst einmal die Laufzeit, welche in der Zeit von Big Data eine der wichtigsten Kriterien für Algorithmen im Bereich Data Science ist. Schon die kleinsten Abweichungen können bei den großen Datenmengen einen erheblichen Unterschied in der Laufzeit machen.
 Es lässt sich leicht erkennen, dass DBSCAN und OPTICS viel effizienter arbeiten als k-Means oder SLINK. Der Unterschied zwischen $n^{4/3}$ \cite{REV} \cite{REVREV} und $n^2$ ist beträchtlich und macht k-Means und SLINK vergleichsweise ziemlich unattraktiv für den Gebrauch in realen Szenarien. In der Veröffentlichung von OPTICS \cite{OPTICS} wurde angemerkt, dass OPTICS 1.6x langsamer als DBSCAN arbeitet. Dies ist zwar nur ein konstanter Faktor, aber trotzdem nicht zu vernachlässigen.\\
-Beim Speicherplatz lassen sich keine relevanten Unterschiede feststellen, bis auf dass k-Means noch zusätzlich die Anzahl der Cluster extra speichern muss.\\
+Beim Speicherplatz lassen sich keine relevanten Unterschiede feststellen, bis auf das k-Means noch zusätzlich die Anzahl der Cluster extra speichern muss.\\
 
 % Tabelle
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
     \begin{tabular}{l|c|c|c|c}
         \textbf{Algorithmus} & DBSCAN & OPTICS & k-Means & SLINK \\
@@ -368,9 +383,9 @@ Er versucht nur die optimalen Positionen der Schwerpunkte in der Datenmenge zu b
 
 Der letzte Abschnitt soll die Qualität der gefundenen Cluster gegenüberstellen und bewerten. Hierfür wurden alle Algorithmen auf der Datenmenge, welche in Abbildung \ref{fig:5} dargestellt ist, mit gut gewählten Parametern (also bereits abgestimmten Werten für den jeweiligen Algorithmus auf die vorliegende Datenmenge) ausgeführt.\footnote{Für die Implementation der Algorithmen und die Erstellung der Datenmenge wurde ELKI\cite{ELKI} verwendet.}
 
-\begin{figure}[hb]
+\begin{figure}[H]
     \centering
-    \includesvg[width=0.5\textwidth]{figures/figure6.svg}
+    \includesvg[width=0.48\textwidth]{figures/figure6.svg}
     \caption{Kontroll-Datenmenge}
     \label{fig:5}
 \end{figure}
@@ -378,25 +393,25 @@ Der letzte Abschnitt soll die Qualität der gefundenen Cluster gegenüberstellen
 Zuerst sollten wir selbst einmal überlegen was eine \glqq gute\grqq{} Aufteilung in Cluster in der vorliegenden Datenmenge ist. Man sieht 5 klar aufgeteilte Cluster, wobei die \textit{Dichte} und \textit{Form} variiert. Oben links ist ein großes viereckiges Cluster, welches in der Mitte noch ein kleiners umhüllt. Unterhalb der beiden befinden sich zwei kleine Cluster mit unterschiedlicher \textit{Dichte}, aber ähnlicher \textit{Form}. Das fünfte Cluster liegt in der Ecke rechts unten und ist sehr verstreut, also hat eine niedrige \textit{Dichte}.\\
 In Abbildung \ref{fig:6} sind nun die Resultate der Clustering Algorithmen aufgeführt, sowie noch einmal unsere Vorstellung eines guten Clusterings.
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \begin{tabular}{|c|c|c|c|c|}
         \hline
         erwartetes Resultat & DBSCAN & OPTICS & k-Means & SLINK\\
         \hline  
-        \raisebox{-\totalheight}{\includesvg[width=0.19\textwidth]{figures/cluster/erwartet.svg}} &
-        \raisebox{-\totalheight}{\includesvg[width=0.19\textwidth]{figures/cluster/DBSCAN.svg}} &
-        \raisebox{-\totalheight}{\includesvg[width=0.19\textwidth]{figures/cluster/OPTICS.svg}} &
-        \raisebox{-\totalheight}{\includesvg[width=0.19\textwidth]{figures/cluster/k-Means.svg}} &
-        \raisebox{-\totalheight}{\includesvg[width=0.19\textwidth]{figures/cluster/SLINK.svg}}\\
+        \raisebox{-\totalheight}{\includesvg[width=0.16\textwidth]{figures/cluster/erwartet.svg}} &
+        \raisebox{-\totalheight}{\includesvg[width=0.16\textwidth]{figures/cluster/DBSCAN.svg}} &
+        \raisebox{-\totalheight}{\includesvg[width=0.16\textwidth]{figures/cluster/OPTICS.svg}} &
+        \raisebox{-\totalheight}{\includesvg[width=0.16\textwidth]{figures/cluster/k-Means.svg}} &
+        \raisebox{-\totalheight}{\includesvg[width=0.16\textwidth]{figures/cluster/SLINK.svg}}\\
         \hline
     \end{tabular}
     \caption{Testergebnisse der 4 Algorithmen}
     \label{fig:6}
 \end{figure}
 
-Man erkennt direkt, dass DBSCAN die Cluster identisch zu unserem erwarteten Ergebnis klassifiziert hat, dabei ist zu beachten, dass DBSCAN auch NOISE erkannt hat (in der Abbildung in Türkis). Die Cluster von OPTICS und SLINK sind ziemlich ähnlich, aber nicht so gut wie die von DBSCAN, da sie das Viereck nicht als eines erkannt haben. Das schlechteste Ergebnis sind die Cluster von k-Means, welcher nur das große Cluster in der unteren rechten Ecke gut erkannt hat, der Rest ist jedoch nicht so, wie es zu erwarten wäre.
-Also zusammengefasst hat DBSCAN die Cluster gut gefunden, das Ergebnis von OPTICS und SLINK war innerhalb tolerierbarer Grenzen und k-Means hat die Cluster nicht erkannt.
+Man erkennt direkt, dass DBSCAN und OPTICS die Cluster identisch zu unserem erwarteten Ergebnis klassifiziert haben, dabei ist zu beachten, dass auch der NOISE erkannt wurde (in der Abbildung in Türkis). Das Resultat von SLINK ist nicht so gut wie bei den Dichte basierten Verfahren, da das Rechteck oben links nicht als ein großes Cluster erkannt wurde. Das schlechteste Clustering ist das vom k-Means Algorithmus, welcher nur das große Cluster in der unteren rechten Ecke richtig erkannt hat. Der Rest ist jedoch nicht wie man es erwarten würde.
+Also zusammengefasst haben DBSCAN und OPTICS die Cluster sehr gut gefunden, das Resultat von SLINK war innerhalb tolerierbarer Grenzen und k-Means hat die Cluster kaum erkannt.
 
 %
 % Fazit
@@ -404,9 +419,9 @@ Also zusammengefasst hat DBSCAN die Cluster gut gefunden, das Ergebnis von OPTIC
 
 \section{Fazit}
 \label{sec:fazit}
-Zum Ende dieser Arbeit wird bewertet, ob der DBSCAN Algorithmus den Anforderungen der heutigen Zeit gerecht werden kann. Dabei wird sich auf die Erkenntnisse aus \hyperref[sec:perf]{Abschnitt 5} bezogen, sowie auf weitere Quellen.\\
+Zum Ende dieser Arbeit wird bewertet, ob der DBSCAN Algorithmus den Anforderungen der heutigen Zeit gerecht werden kann. Dabei wird sich auf die Erkenntnisse aus \hyperref[sec:perf]{Abschnitt \ref{sec:perf}} bezogen, sowie auf weitere Quellen.\\
 Die Resultate der Performance Evaluation zeigen, dass der Algorithmus die Fähigkeit hat hervorragende Clustering-Ergebnisse zu erzeugen und dies sogar relativ effizient. Die Implementierung ist komplizierter als bei anderen Verfahren. Dies ist jedoch nicht erheblich genug, um als schwierig eingestuft zu werden.\\
-Trotzdem komme ich zu dem Urteil, dass DBSCAN in dieser einfachen Form nicht mehr den heutigen Herausforderungen gewachsen ist. Das Problem ist, dass der Algorithmus, obwohl die Laufzeit Komplexität sehr gut scheint, immernoch zu langsam arbeitet. Dies bedeutet aber nicht, dass das Konzept schlecht aufgestellt ist, denn es ist meiner Meinung nach sogar eine sehr natürliche Art Cluster in einer Datenmenge zu bestimmen. Der Grund, weshalb der Algorithmus nicht schnell genug arbeitet, ist die mangelnde Parallelisierbarkeit. MR-DBSCAN \cite{PARALLEL} schafft es zum Beispiel dieses Konzept, welches in der heutigen Zeit sehr wichtig ist, umzusetzen und ist so deutlich schneller als sein Vorgänger. Des Weiteren benötigt der Algorithmus zwei Parameter, welche je nach Bedarf angepasst werden müssen. Aufgrund dieser Schwachstellen ist der Algorithmus für den heutigen Gebrauch unter realen Szenarien sehr unatraktiv, da ähnliche Verfahren \cite{PPF} existieren, welche diese Mängel beheben.\\
+Trotzdem komme ich zu dem Urteil, dass DBSCAN in dieser einfachen Form nicht mehr leicht auf reale Szenarien anwendbar ist. Das Problem ist, dass der Algorithmus, obwohl die Laufzeit Komplexität sehr gut scheint, immernoch zu langsam arbeitet. Dies bedeutet aber nicht, dass das Konzept schlecht aufgestellt ist, denn es ist meiner Meinung nach sogar eine sehr natürliche Art Cluster in einer Datenmenge zu bestimmen. Der Grund, weshalb der Algorithmus nicht schnell genug arbeitet, ist unteranderem die mangelnde Parallelisierbarkeit. MR-DBSCAN \cite{PARALLEL}, welcher in \hyperref[sec:perf]{Abschnitt \ref{sec:related}} vorgestellt wurde, schafft es zum Beispiel dieses Konzept, welches in der heutigen Zeit sehr wichtig ist, umzusetzen und ist so deutlich schneller als sein Vorgänger. Des Weiteren benötigt der Algorithmus zwei Parameter, welche je nach Bedarf angepasst werden müssen. Aufgrund dieser Schwachstellen ist der Algorithmus für den heutigen Gebrauch unter realen Szenarien sehr unatraktiv, da ähnliche Verfahren \cite{PPF} existieren, welche diese Mängel beheben.\\
 Dieses soll den eigentlichen Algorithmus, bzw. die Veröffentlichung nicht direkt kritisieren, sondern nur zeigen, dass sich in den letzten 20 Jahren viel im Bereich Data Mining verändert hat und deshalb die alten Verfahren nicht ohne weiteres eingesetzt werden können. Das Konzept des DBSCAN Clusterings bleibt revolutionär und hat in vielen ähnlichen Verfahren Verwendung gefunden, welche den heutigen Anforderungen gerecht werden und somit bleibt die Grundidee bestehen.
 
 \bibliography{references}
